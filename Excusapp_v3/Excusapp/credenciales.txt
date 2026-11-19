@@ -1,0 +1,56 @@
+====================================================================
+               EXCUSAPP - CREDANCIALES DE PRUEBA Y ACCESO
+====================================================================
+Proyecto: ExcusApp - Sistema Institucional de Excusas Escolares
+Versión: 2026.1 (Sincronizado con Firebase Firestore & API PHP/MySQL)
+Fecha: 2026-07-28
+====================================================================
+
+1. ROL: ACUDIENTE / TUTOR (RF-01, RF-02)
+--------------------------------------------------------------------
+Permisos: Radicar excusas, adjuntar evidencias, ver historial de
+sus estudiantes vinculados, consultar estado (Pendiente/Aprobada/Rechazada).
+
+* Cuenta Acudiente 1:
+  - Correo Electrónico: carlos.tabares@gmail.com
+  - Contraseña:         ExcusApp2026!
+  - Nombre Completo:     Carlos Tabares
+  - Documento:           CC-1234001
+  - Estudiantes a cargo: TABARES RAMIREZ LAURA SOFIA (Grado 11A)
+  - Estado Aprobación:   Aprobado (RF-02)
+
+* Cuenta Acudiente 2:
+  - Correo Electrónico: martha.giraldo@outlook.com
+  - Contraseña:         ExcusApp2026!
+  - Nombre Completo:     Martha Giraldo
+  - Documento:           CC-1234002
+  - Estudiantes a cargo: MORALES GIRALDO LAURA SOFIA (Grado 11B)
+  - Estado Aprobación:   Aprobado (RF-02)
+
+* Cuenta Acudiente 3:
+  - Correo Electrónico: roberto.hernandez@yahoo.es
+  - Contraseña:         ExcusApp2026!
+  - Nombre Completo:     Roberto Hernández
+  - Documento:           CC-1234003
+  - Estudiantes a cargo: HERNANDEZ ACEVEDO SARA MARIA (Grado 11A)
+  - Estado Aprobación:   Aprobado (RF-02)
+
+
+2. ROL: COORDINACIÓN ACADÉMICA / ADMINISTRACIÓN (RF-09, RF-10)
+--------------------------------------------------------------------
+Permisos: Revisar y validar excusas radicadas en todo el colegio,
+Aprobar (A) o Rechazar (R) con observaciones obligatorias, aprobar
+cuentas de acudientes pendientes (RF-02), auditar notificaciones (RF-06),
+filtrar por grados y generar reportes.
+
+* Cuenta Coordinador(a):
+  - Correo Electrónico: coordinacion@colegio.edu.co
+  - Contraseña:         coord2026
+  - Nombre del Cargo:   Coordinación Académica e Institucional
+
+
+3. MOTORES DE AUTENTICACIÓN SOPORTADOS
+--------------------------------------------------------------------
+a) Firebase Authentication + Firestore DB (Sincronización en Tiempo Real)
+b) Backend API PHP (PDO) + Base de Datos MySQL / MariaDB (database.sql)
+====================================================================

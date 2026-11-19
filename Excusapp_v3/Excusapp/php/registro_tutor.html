@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestión de tutores y estudiantes - ExcusApp</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #4a2e1b;
+      background: #fdfbf7;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .page { max-width: 1500px; margin: 0 auto; padding: 26px 32px 40px; }
+    .topbar { display: flex; align-items: center; gap: 16px; margin: -26px -32px 0; padding: 14px 32px; background: #6e472b; border-bottom: 1px solid #5c3a21; color: #eadcc9; }
+    .back { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 auto; border: 1px solid #8c5832; border-radius: 8px; background: #5c3a21; color: #d49b27; text-decoration: none; font-size: 24px; }
+    .back:hover { background: #4a2e1b; }
+    .title-block { flex: 1; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(24px, 3vw, 36px); color: #d49b27; }
+    .subtitle { margin: 5px 0 0; color: #eadcc9; font-size: 14px; }
+    .tabs { display: flex; gap: 10px; padding: 20px 0; }
+    .tab { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border: 1px solid #d9c8b4; border-radius: 7px; color: #6e472b; font-weight: 700; text-decoration: none; }
+    .tab.active { border-color: #6e472b; background: #6e472b; color: white; }
+    .layout { display: grid; grid-template-columns: minmax(300px, .85fr) minmax(0, 1.3fr); gap: 24px; align-items: start; }
+    .card { min-width: 0; padding: 22px 24px; border: 1px solid #d9c8b4; border-radius: 10px; background: #fffdfa; box-shadow: 0 2px 6px #4a2e1b0d; }
+    .card h2 { margin: 0; font-size: 17px; letter-spacing: .03em; text-transform: uppercase; }
+    .card-description { margin: 6px 0 18px; color: #8c5832; font-size: 13px; }
+    .divider { border: 0; border-top: 1px solid #eadcc9; margin: 15px 0 18px; }
+    label { display: block; margin: 13px 0 0; font-size: 14px; font-weight: 600; }
+    label span { color: #a63e23; }
+    input, select { width: 100%; margin-top: 6px; padding: 12px; border: 1px solid #d9c8b4; border-radius: 5px; background: white; color: #4a2e1b; }
+    input:focus, select:focus { outline: 2px solid #d49b27; outline-offset: 1px; }
+    button { border: 0; border-radius: 5px; padding: 11px 15px; background: #6e472b; color: white; font-weight: 700; cursor: pointer; }
+    button:hover { background: #5c3a21; }
+    button:disabled { cursor: wait; opacity: .65; }
+    .submit { width: 100%; margin-top: 18px; }
+    .list-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .search { width: min(100%, 300px); margin: 0; }
+    .count { margin: 5px 0 0; color: #8c5832; font-size: 13px; }
+    .table-wrap { max-height: 520px; overflow: auto; border: 1px solid #eadcc9; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th { position: sticky; top: 0; z-index: 1; padding: 12px; background: #6e472b; color: white; white-space: nowrap; }
+    td { padding: 11px 12px; border-bottom: 1px solid #eadcc9; }
+    tbody tr:nth-child(even) { background: #f8f3ea; }
+    .contact { display: grid; gap: 4px; min-width: 150px; overflow: hidden; }
+    .contact span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .status { display: inline-block; padding: 5px 9px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .approved { color: #138047; background: #dcfce7; }
+    .pending { color: #a16207; background: #fef3c7; }
+    .status-button { padding: 6px 8px; background: transparent; color: #6e472b; font-size: 11px; }
+    .status-button:hover { background: #eadcc9; }
+    .message { min-height: 22px; margin: 14px 0 0; font-size: 14px; }
+    .message.error { color: #a1271d; }
+    .message.success { color: #138047; }
+    .empty { padding: 25px; color: #8c5832; text-align: center; }
+    .loading { color: #8c5832; }
+    @media (max-width: 820px) {
+      .page { padding: 18px 16px 30px; }
+      .topbar { margin: -18px -16px 0; padding: 12px 16px; }
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .topbar { align-items: flex-start; }
+      .back { width: 38px; height: 38px; }
+      .tabs { display: grid; grid-template-columns: 1fr 1fr; }
+      .tab { justify-content: center; padding: 10px 6px; font-size: 13px; }
+      .card { padding: 18px 14px; }
+      .list-heading { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      th, td { padding: 9px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="back" id="back-link" href="../" aria-label="Volver a coordinación">←</a>
+      <div class="title-block">
+        <h1 id="page-title">Gestión de tutores y estudiantes</h1>
+        <p class="subtitle" id="page-subtitle">Registro oficial de la comunidad escolar (RF-01, RF-02)</p>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Gestión de la comunidad escolar">
+      <a class="tab" data-view="tutores" href="?vista=tutores">♙ Ingreso Tutores</a>
+      <a class="tab" data-view="estudiantes" href="?vista=estudiantes">♧ Ingreso Estudiantes</a>
+    </nav>
+
+    <div class="layout">
+      <section class="card">
+        <h2 id="form-title">Formulario de nuevo tutor</h2>
+        <p class="card-description" id="form-description">Registro oficial de acudientes con validación institucional.</p>
+        <hr class="divider">
+
+        <form id="tutor-form">
+          <label>Documento de identidad (cédula) <span>*</span>
+            <input name="documento" required maxlength="20" placeholder="Ej.: CC-1234012 o 1011234012">
+          </label>
+          <label>Nombre completo del acudiente <span>*</span>
+            <input name="nombre_completo" required maxlength="100" placeholder="Ej.: Roberto Gómez Sánchez">
+          </label>
+          <label>Correo electrónico (notificaciones) <span>*</span>
+            <input name="email" type="email" required maxlength="100" placeholder="Ej.: roberto.gomez@gmail.com">
+          </label>
+          <label>Teléfono de contacto <span>*</span>
+            <input name="telefono" type="tel" required maxlength="20" placeholder="Ej.: 3101234567">
+          </label>
+          <button class="submit" type="submit">Registrar tutor</button>
+        </form>
+
+        <form id="student-form" hidden>
+          <label>Tutor o acudiente <span>*</span>
+            <select name="tutor_id" required>
+              <option value="">Seleccione un tutor registrado</option>
+            </select>
+          </label>
+          <label>Documento de identidad del estudiante <span>*</span>
+            <input name="documento" required maxlength="20" placeholder="Ej.: 1011234012">
+          </label>
+          <label>Nombre completo del estudiante <span>*</span>
+            <input name="nombre_completo" required maxlength="100" placeholder="Ej.: Daniela Gómez">
+          </label>
+          <label>Grado <span>*</span>
+            <input name="grado" required maxlength="10" placeholder="Ej.: 8a">
+          </label>
+          <button class="submit" type="submit">Registrar estudiante</button>
+        </form>
+        <p class="message" id="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card">
+        <div class="list-heading">
+          <div>
+            <h2 id="list-title">Tutores registrados en el sistema</h2>
+            <p class="count" id="count">Cargando registros...</p>
+          </div>
+          <input class="search" id="search" type="search" placeholder="Buscar por nombre, cédula o email" aria-label="Buscar registros">
+        </div>
+        <hr class="divider">
+        <div class="table-wrap">
+          <table>
+            <thead id="table-head"></thead>
+            <tbody id="table-body"><tr><td class="empty loading">Consultando la base de datos...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    let view = params.get('vista') === 'estudiantes' ? 'estudiantes' : 'tutores';
+    let tutors = [];
+    let students = [];
+    let schoolDatabase = [];
+    const tutorForm = document.getElementById('tutor-form');
+    const studentForm = document.getElementById('student-form');
+    const tutorSelect = studentForm.elements.tutor_id;
+    const message = document.getElementById('message');
+    const search = document.getElementById('search');
+
+    document.getElementById('back-link').addEventListener('click', () => {
+      if (sessionStorage.getItem('excusa_coordinator_management') === '1') {
+        sessionStorage.removeItem('excusa_coordinator_management');
+        sessionStorage.setItem('excusa_coordinator_return', '1');
+      }
+    });
+
+    function setMessage(text, kind = '') {
+      message.textContent = text;
+      message.className = `message ${kind}`;
+    }
+
+    async function readResponse(response) {
+      const body = await response.json();
+      if (!response.ok || body.status !== 'success') {
+        throw new Error(body.message || 'No se pudo completar la solicitud.');
+      }
+      return body;
+    }
+
+    function addCell(row, value, className = '') {
+      const cell = document.createElement('td');
+      cell.textContent = value ?? '';
+      if (className) cell.className = className;
+      row.appendChild(cell);
+      return cell;
+    }
+
+    function renderTutorTable(records) {
+      const head = document.getElementById('table-head');
+      const body = document.getElementById('table-body');
+      head.innerHTML = '<tr><th>Documento</th><th>Nombre</th><th>Contacto</th><th>Estado (RF-02)</th></tr>';
+      body.replaceChildren();
+      if (!records.length) {
+        body.innerHTML = '<tr><td colspan="4" class="empty">No hay tutores que coincidan con la búsqueda.</td></tr>';
+        return;
+      }
+
+      records.forEach((tutor) => {
+        const row = document.createElement('tr');
+        addCell(row, tutor.documento);
+        addCell(row, tutor.nombre);
+        const contact = document.createElement('td');
+        const contactInfo = document.createElement('div');
+        contactInfo.className = 'contact';
+        const email = document.createElement('span');
+        email.textContent = `✉ ${tutor.email}`;
+        const phone = document.createElement('span');
+        phone.textContent = `☎ ${tutor.telefono}`;
+        contactInfo.append(email, phone);
+        contact.appendChild(contactInfo);
+        row.appendChild(contact);
+        const state = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = `status ${tutor.aprobado ? 'approved' : 'pending'}`;
+        badge.textContent = tutor.aprobado ? '✓ Aprobado' : 'Pendiente';
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'status-button';
+        toggle.textContent = tutor.aprobado ? 'Revocar' : 'Aprobar';
+        toggle.addEventListener('click', () => updateApproval(tutor));
+        state.append(badge, toggle);
+        row.appendChild(state);
+        body.appendChild(row);
+      });
+    }
+
+    function renderStudentTable(records) {
+      const head = document.getElementById('table-head');
+      const body = document.getElementById('table-body');
+      head.innerHTML = '<tr><th>Documento</th><th>Nombre</th><th>Grado</th><th>Tutor</th><th>Correo del tutor</th></tr>';
+      body.replaceChildren();
+      if (!records.length) {
+        body.innerHTML = '<tr><td colspan="5" class="empty">No hay estudiantes que coincidan con la búsqueda.</td></tr>';
+        return;
+      }
+
+      records.forEach((student) => {
+        const row = document.createElement('tr');
+        addCell(row, student.studentDocument);
+        addCell(row, student.studentName);
+        addCell(row, student.grade);
+        addCell(row, student.tutorName);
+        addCell(row, student.tutorEmail);
+        body.appendChild(row);
+      });
+    }
+
+    function render() {
+      const query = search.value.trim().toLocaleLowerCase('es');
+      const isTutors = view === 'tutores';
+      document.title = `${isTutors ? 'Ingreso Tutores' : 'Ingreso Estudiantes'} - ExcusApp`;
+      document.getElementById('page-title').textContent = isTutors
+        ? 'Ingreso y Gestión de Tutores (Acudientes)'
+        : 'Ingreso y Gestión de Estudiantes';
+      document.getElementById('page-subtitle').textContent = isTutors
+        ? 'Registro oficial de acudientes con validación de identidad (RF-01, RF-02)'
+        : 'Registro oficial de estudiantes vinculados a un tutor (RF-01)';
+      document.getElementById('form-title').textContent = isTutors ? 'Formulario de nuevo tutor' : 'Formulario de nuevo estudiante';
+      document.getElementById('form-description').textContent = isTutors
+        ? 'La cuenta nueva quedará pendiente hasta su aprobación por coordinación.'
+        : 'Seleccione un tutor registrado para vincular al estudiante.';
+      document.getElementById('list-title').textContent = isTutors ? 'Tutores registrados en el sistema' : 'Estudiantes registrados en el sistema';
+      document.getElementById('search').placeholder = isTutors
+        ? 'Buscar por nombre, cédula o email'
+        : 'Buscar por nombre, cédula, grado o tutor';
+      document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.view === view));
+      tutorForm.hidden = !isTutors;
+      studentForm.hidden = isTutors;
+
+      if (isTutors) {
+        const filtered = tutors.filter((item) =>
+          [item.nombre, item.documento, item.email, item.telefono].some((value) =>
+            String(value).toLocaleLowerCase('es').includes(query)
+          )
+        );
+        document.getElementById('count').textContent = `Total: ${tutors.length} acudientes oficiales`;
+        renderTutorTable(filtered);
+      } else {
+        const filtered = schoolDatabase.filter((item) =>
+          [item.studentName, item.studentDocument, item.grade, item.tutorName, item.tutorEmail].some((value) =>
+            String(value).toLocaleLowerCase('es').includes(query)
+          )
+        );
+        document.getElementById('count').textContent = `Total: ${students.length} estudiantes matriculados`;
+        renderStudentTable(filtered);
+      }
+    }
+
+    async function loadRecords() {
+      try {
+        const response = await fetch('./estudiantes.php', { cache: 'no-store' });
+        const body = await readResponse(response);
+        tutors = body.tutores;
+        students = body.students;
+        schoolDatabase = body.schoolDatabase;
+        const selected = tutorSelect.value;
+        tutorSelect.replaceChildren(new Option('Seleccione un tutor registrado', ''));
+        tutors.forEach((tutor) => {
+          const option = new Option(`${tutor.nombre} — ${tutor.documento}${tutor.aprobado ? '' : ' (pendiente)'}`, tutor.id);
+          tutorSelect.add(option);
+        });
+        if (selected) tutorSelect.value = selected;
+        render();
+      } catch (error) {
+        document.getElementById('count').textContent = 'No se pudieron consultar los registros.';
+        document.getElementById('table-body').innerHTML = `<tr><td class="empty">${error.message}</td></tr>`;
+      }
+    }
+
+    async function updateApproval(tutor) {
+      try {
+        const response = await fetch('./actualizar_aprobacion_tutor.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tutor_id: tutor.id, aprobado: !tutor.aprobado })
+        });
+        await readResponse(response);
+        setMessage(`Estado de ${tutor.nombre} actualizado.`, 'success');
+        await loadRecords();
+      } catch (error) {
+        setMessage(error.message, 'error');
+      }
+    }
+
+    tutorForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = tutorForm.querySelector('button[type="submit"]');
+      button.disabled = true;
+      setMessage('Guardando tutor...');
+      try {
+        const response = await fetch('./registrar_tutor.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tutor: Object.fromEntries(new FormData(tutorForm)), estudiantes: [] })
+        });
+        const body = await readResponse(response);
+        tutorForm.reset();
+        setMessage(body.message, 'success');
+        view = 'estudiantes';
+        history.replaceState(null, '', '?vista=estudiantes');
+        await loadRecords();
+        tutorSelect.value = String(body.tutor_id);
+      } catch (error) {
+        setMessage(error.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    studentForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = studentForm.querySelector('button[type="submit"]');
+      button.disabled = true;
+      setMessage('Guardando estudiante...');
+      try {
+        const values = Object.fromEntries(new FormData(studentForm));
+        const response = await fetch('./registrar_estudiante.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values)
+        });
+        const body = await readResponse(response);
+        studentForm.elements.documento.value = '';
+        studentForm.elements.nombre_completo.value = '';
+        studentForm.elements.grado.value = '';
+        setMessage(body.message, 'success');
+        await loadRecords();
+        tutorSelect.value = values.tutor_id;
+      } catch (error) {
+        setMessage(error.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    search.addEventListener('input', render);
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', (event) => {
+        event.preventDefault();
+        view = tab.dataset.view;
+        history.replaceState(null, '', `?vista=${view}`);
+        setMessage('');
+        render();
+      });
+    });
+
+    render();
+    loadRecords();
+  </script>
+</body>
+</html>
